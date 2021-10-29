@@ -1,0 +1,86 @@
+// flexbox gap polyfill
+// reference from 'https://2heng.xin/2021/07/30/flex-gap-polyfill-with-scss-mixins/'
+
+.row-margin(@transform, @row) when (@row) {
+  margin-right: @transform;
+  margin-left: @transform;
+}
+.column-margin(@transform, @row) when not (@row) {
+  margin-top: @transform;
+  margin-bottom: @transform;
+}
+
+.row-child-margin(@margin, @row) when (@row) {
+  margin-right: @margin;
+  margin-left: @margin;
+}
+
+.column-child-margin(@margin, @row) when not (@row) {
+  margin-top: @margin;
+  margin-bottom: @margin;
+}
+
+._flex-gap(@gap, @row: true) {
+  @margin: (@gap / 2);
+  @transform: -@margin;
+  .row-margin(@transform, @row);
+  .column-margin(@transform, @row);
+
+  & > * {
+    .row-child-margin(@margin, @row);
+    .column-child-margin(@margin, @row);
+  }
+}
+
+// felx-gap, used in @media screen with rules
+.flex-gap(@gap, @flex-flow: 'row nowrap') when (@flex-flow = 'row nowrap'), (@flex-flow = 'row-reverse nowrap') {
+  ._flex-gap(@gap, true);
+}
+
+.flex-gap(@gap, @flex-flow: 'row nowrap') when (@flex-flow= 'column nowrap' ), (@flex-flow= 'column-reverse nowrap') {
+  ._flex-gap(@gap, false);
+}
+
+.flex-gap(@gap, @flex-flow: 'row nowrap') when (@flex-flow= 'row wrap' ), (@flex-flow= 'row-reverse wrap') {
+  ._flex-gap(@gap, true);
+  ._flex-gap(@gap, false);
+}
+
+.flex-gap(@gap, @flex-flow: 'row nowrap') when (@flex-flow= 'column wrap' ), (@flex-flow= 'column-reverse wrap') {
+  ._flex-gap(@gap, true);
+  ._flex-gap(@gap, false);
+}
+
+._flex-gap-unset(@row: true) {
+  @margin: 0;
+  @transform: 0;
+  margin-top: if(not (@row), @transform, 0);
+  margin-right: if((@row), @transform, 0);
+  margin-bottom: if(not (@row), @transform, 0);
+  margin-left: if((@row), @transform, 0);
+  & > * {
+    margin-top: if(not (@row), @margin, 0);
+    margin-right: if((@row), @margin, 0);
+    margin-bottom: if(not (@row), @margin, 0);
+    margin-left: if((@row), @margin, 0);
+  }
+}
+
+// unset felx-gap, used in @media screen with rules
+.flex-gap-unset(@flex-flow: 'row nowrap') when (@flex-flow = 'row nowrap'), (@flex-flow = 'row-reverse nowrap') {
+  ._flex-gap-unset(true);
+}
+
+.flex-gap-unset(@flex-flow: 'row nowrap') when (@flex-flow= 'column nowrap' ), (@flex-flow= 'column-reverse nowrap') {
+  ._flex-gap-unset(false);
+}
+
+.flex-gap-unset(@flex-flow: 'row nowrap') when (@flex-flow= 'row wrap' ), (@flex-flow= 'row-reverse wrap') {
+  ._flex-gap-unset(true);
+  ._flex-gap-unset(false);
+}
+
+.flex-gap-unset(@flex-flow: 'row nowrap') when (@flex-flow= 'column wrap' ), (@flex-flow= 'column-reverse wrap') {
+  ._flex-gap-unset(true);
+  ._flex-gap-unset(false);
+}
